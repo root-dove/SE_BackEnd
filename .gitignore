@@ -1,0 +1,4 @@
+# 데이터베이스 관련 무시할 파일들
+venv/
+database.db
+__pycache__/
