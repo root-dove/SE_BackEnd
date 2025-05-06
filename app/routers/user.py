@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.database import database
 from app.models import user
 from pydantic import BaseModel
 from typing import List
 from datetime import date
+from app.dependencies import get_current_user
+
 
 router = APIRouter()
 
@@ -31,3 +33,7 @@ async def create_user(user_data: UserIn):
     query = user.insert().values(**user_data.dict())
     await database.execute(query)
     return user_data
+
+@router.get("/me")
+async def get_me(current_user: str = Depends(get_current_user)):
+    return {"user": current_user}
