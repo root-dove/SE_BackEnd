@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.database import database
 from app.models import user
 from pydantic import BaseModel
@@ -46,7 +46,7 @@ async def get_user(uid: str):
 
 # PUT: 유저 정보 수정
 @router.put("/users/{uid}", response_model=UserOut)
-async def update_user(uid: str, user_data: UserIn, token_data: dict = Depends(verify_jwt_token)):
+async def update_user(user_data: UserIn, token_data: dict = Depends(verify_jwt_token)):
     # JWT 검증 및 사용자 정보 추출
     try:
         token = token_data["token"]
