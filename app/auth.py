@@ -19,10 +19,10 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 # JWT 토큰 생성 함수
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(uid: str, nickname: str, expires_delta: timedelta | None = None):
     to_encode = {
-        "sub": data["UID"],
-        "nickname": data["NICKNAME"],
+        "sub": uid,
+        "nickname": nickname,
         "exp": datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     }
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

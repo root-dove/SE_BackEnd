@@ -5,9 +5,11 @@ from pydantic import BaseModel
 from typing import List
 from datetime import date
 from app.dependencies import get_current_user
-
+from app.auth import get_password_hash
 
 router = APIRouter()
+
+jwt = Depends(get_current_user)
 
 # 요청용 스키마
 class UserIn(BaseModel):
@@ -30,10 +32,14 @@ async def get_users():
 # POST: 유저 추가
 @router.post("/users/", response_model=UserOut)
 async def create_user(user_data: UserIn):
-    query = user.insert().values(**user_data.dict())
+    hashed_password = get_password_hash(user_data.PASSWORD)
+    new_user = user_data.dict()
+    new_user["PASSWORD"] = hashed_password
+
+    query = user.insert().values(**new_user)
     await database.execute(query)
     return user_data
 
-@router.get("/me")
+@router.get("/me", dependencies=[jwt])
 async def get_me(current_user: str = Depends(get_current_user)):
     return {"user": current_user}

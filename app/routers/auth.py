@@ -25,9 +25,9 @@ async def login(data: LoginRequest):
 
     user_data = dict(result)  # Row -> dict
 
-    print("입력 비밀번호:", data.PASSWORD)
-    print("DB 해시:", user_data["PASSWORD"])
-    print("비교 결과:", verify_password(data.PASSWORD, user_data["PASSWORD"]))
+    print("user_data 전체:", dict(user_data))
+    print("nickname:", user_data["NICKNAME"])
+
 
     if not verify_password(data.PASSWORD, user_data["PASSWORD"]):
         raise HTTPException(status_code=401, detail="비밀번호 틀림")

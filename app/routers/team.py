@@ -1,10 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.database import database
 from app.models import team, user, project
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
+from app.dependencies import get_current_user
 import sqlalchemy as sa
+
+jwt = Depends(get_current_user)
 
 router = APIRouter()
 
@@ -26,7 +29,7 @@ async def get_teams():
     return await database.fetch_all(query)
 
 # 팀원 추가
-@router.post("/teams/", response_model=TeamOut)
+@router.post("/teams/", response_model=TeamOut, dependencies=[jwt])
 async def add_team_member(team_data: TeamIn):
     query = team.insert().values(**team_data.dict())
     last_id = await database.execute(query)
@@ -34,7 +37,7 @@ async def add_team_member(team_data: TeamIn):
 
 # 팀원 검색 API (UID 또는 NICKNAME으로 검색)
 # 나중에 POST로 변경하면 좋을듯
-@router.get("/teams/search", response_model=List[TeamOut])
+@router.get("/teams/search", response_model=List[TeamOut], dependencies=[jwt])
 async def search_teams(nickname: Optional[str] = None, project_name: Optional[str] = None):
     
     query = sa.select(team).select_from(
